@@ -1,0 +1,11 @@
+proposal.aux
+proposal.log
+*.log
+*.aux
+
+docs/*.log
+docs/*.aux
+
+data/*.json
+data/*.csv
+data/*.json.gz
