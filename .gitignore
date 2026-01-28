@@ -9,3 +9,8 @@ docs/*.aux
 data/*.json
 data/*.csv
 data/*.json.gz
+
+venv/
+__pycache__/
+scripts/venv/
+scripts/__pycache__/
