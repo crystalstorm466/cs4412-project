@@ -8,8 +8,48 @@ from mlxtend.frequent_patterns import association_rules
 import sys
 import gc
 from fim import fpgrowth
+import langid
+
 
 MAX_SHELVES = 5000
+
+def is_english(text):
+    #Returns true if lanaguage detected is English 
+    
+    if not text or len(text.strip()) < 10:
+        return False
+    lang, _ = langid.classify(text)
+    return lang == 'en'
+
+def filter_english(input_path, output_path):
+    print(f"Filtering English for datasets")
+
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+    count = 0 
+    saved = 0 
+
+    open_func = gzip.open if input_path.endswith('.gz') else open 
+
+    with open_func(input_path, 'rt', encoding='utf-8') as fin, \
+            open(output_path, 'w', encoding='utf-8') as fout:
+
+                for line in fin:
+                    try:
+                        record = json.loads(line)
+                        count += 1 
+
+                        texts_to_check = record.get('review_text', record.get('title', ''))
+
+                        if is_english(texts_to_check):
+                            fout.write(json.dumps(record) + '\n')
+                            saved += 1 
+                        if count % 50000 == 0:
+                            print(f"processed {count}..Saved {saved} English records")
+                    except(json.JSONDecodeError, ValueError):
+                        continue
+    print(f"Done! Processed {count} total records. Saved {saved} English-only records.")
+
 def extract_shelf_transactions(input_path, output_path, min_count=10):
     """
     Extracts 'popular_shelves' from the metadata to create a transaction dataset.
@@ -113,6 +153,8 @@ if __name__ == "__main__":
     output_path = sys.argv[3]
 
     if os.path.exists(input_file):
+
+        filter_english(sys.argv[1], sys.argv[2])
         # 1. Extraction (Streams through file, uses very little RAM)
         extract_shelf_transactions(input_file, transaction_file, min_count=15)
         
