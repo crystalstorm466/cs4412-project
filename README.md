@@ -25,7 +25,7 @@ Windows:
 
 ```bat 
   python -m venv venv
-  .\venv\Scripts\activate
+  venv\Scripts\activate
 ```
 
 Mac/Linux
@@ -41,5 +41,7 @@ Windows/Linux
 ```sh
   pip install -r requirements.txt
 ```
+
+# M2: Inital Implementation
 
 
