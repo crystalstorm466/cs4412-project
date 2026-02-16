@@ -45,3 +45,10 @@ Windows/Linux
 # M2: Inital Implementation
 
 
+To access the Jupyter Notebook
+
+For all platforms:
+
+```sh
+   jupyter lab
+```
