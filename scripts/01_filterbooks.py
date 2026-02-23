@@ -37,7 +37,7 @@ def filter_goodreads_data(input_path, output_path, target_keywords):
 
 if __name__ == "__main__":
     # Define your "Romantasy" anchor keywords
-    keywords = ['romantasy', 'romantic-fantasy', 'fantasy-romance']
+    keywords = ['romantasy', 'romantic-fantasy', 'fantasy-romance', 'romance', 'fantasy', 'romantic']
     
     # Update these paths to your actual local file locations
     input_file = "data/goodreads_books.json.gz"
