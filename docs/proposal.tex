@@ -52,6 +52,7 @@ This project will utilize the Goodreads Book Datasets (2017) curated by Julian M
 The dataset is split into two primary components:
 \begin{enumerate}
     \item \textbf{Metadata (\textit{goodreads\_books.json}):} Contains \texttt{book\_id}, \texttt{title}, \texttt{authors}, \texttt{average\_rating}, and importantly, \texttt{popular\_shelves} (user-defined tags).
+
     \item \textbf{Reviews (\textit{goodreads\_reviews.json}):} Contains \texttt{user\_id}, \texttt{book\_id}, \texttt{rating}, \texttt{review\_text}, and \texttt{n\_votes}.
     \item \textbf{User Interactions (\textit{goodreads\_interactions.csv}):} Contains \texttt{user\_id}, \texttt{book\_id}, \texttt{is\_read}, \texttt{rating}, and \texttt{is\_reviewed}.
 \end{enumerate}
@@ -67,7 +68,7 @@ This project moves beyond prediction models to investigate the following questio
 \begin{itemize}
     \item What are the hidden associations between specfic book genres and user-defined "shelves"? (Do readers of "Romantasy (Romance Fantasy) also show high interset in "Historical Romance" or other fantsay genres?)
     \item Can we identify distinct Reader Personas based on interaction metrics? By clustering users based on their average rating variance, review frequency, and review length our goal is to discover if it is possible to classify readers as a critical reviewer or casual consumer.
-    \item What type of patterns emerge from highly-voted reviews compared to low-voted ones? 
+    \item What type of patterns emerge from highly-voted reviews compared to low-voted ones?
 \end{itemize}
 
 \section{Planned Techniques}
@@ -109,16 +110,34 @@ M4 & Weeks 14 & Text Mining (LDA), Final Report \\ \bottomrule
 \end{table}
 \subsection{Anticipated Challenges}
 \begin{itemize}
-    \item   Our primary challenge is lack of experience in analyzing data sets. 
-    \item Another challene is the volume of data. The Goodreads dataset is comprised of multiple csv and jsons files that is multiple gigabytes compressed. Handling this in local memory will require using pandas chunking or focusing on smaller genre subsets. Text data can also be "noisy" and will require filtering to produce meaningful topics. 
+    \item   Our primary challenge is lack of experience in analyzing data sets.
+    \item Another challenge is the volume of data. The Goodreads dataset is comprised of multiple csv and jsons files that is multiple gigabytes compressed. Handling this in local memory will require using pandas chunking or focusing on smaller genre subsets. Text data can also be "noisy" and will require filtering to produce meaningful topics.
+    \item Due to Goodreads' global reach our team expects to encounter non-English reviews, books, and shelf titles. Our team will have to strip any non-English text out of the datasets in order to prevent any of our proposed tests from failing.
 \end{itemize}
-  
-    
+
+\section{Milestone 2}
+
+This section details the work done for Milestone 2 of this data mining project.
+
+\subsection{Exploratory Data Analysis}
+
+In order to transition from the introductionary and theorteical discovery questions from the previous sections our team implemented multiple pipelines to select and transmit the raw data from the dataset.
+ To address the first discovery question regarding the hidden assoications we wrote some python scripts. This script performs a keyword search across the "popular_shelves" attirbute of the `goodreads_books.json.gz` file. We spefically search for genres: 'romantasy', 'romantic-fantasy', 'fantasy-romance', 'romance', 'fantasy', and 'romantic'. The filtered results are stored in 01_filteredbooks.json. The resulting json consists of records: book_id, title, average_rating, shelves_list.
+    In order to answer discovery question 2 we need to example the different interactions users make so we exmaine interactions on books across the site along with the types of reviews. We implemented a second filtering script that utilizes the book_id from our previous script to perform an extraction from the goodreads_reviews_dedup.json.gz dataset. The extracted data is stored in 03_extractedreviews.csv
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.5\linewidth]{rating_histogram.png}
+        \caption{ Distribution ofboos  rating in 01_goodreadsbooks.csv}
+        \label{fig:placeholder}
+    \end{figure}
+
+    Examining the histogram of the average ratings of th
 \section*{Acknowledgment}
 The author would like to thank Julian McAuley for providing the Goodreads dataset and Kennesaw State University for the computational resources.
 
 \begin{thebibliography}{00}
-\bibitem{b1} Mengting Wan, Julian McAuley, "Item Recommendation on Monotonic Behavior Chains", in RecSys'18. 
+\bibitem{b1} Mengting Wan, Julian McAuley, "Item Recommendation on Monotonic Behavior Chains", in RecSys'18.
 \bibitem{b2} Mengting Wan, Rishabh Misra, Ndapa Nakashole, Julian McAuley, "Fine-Grained Spoiler Detection from Large-Scale Review Corpora", in ACL'19
 
 \end{thebibliography}
