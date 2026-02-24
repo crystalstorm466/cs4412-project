@@ -4,18 +4,96 @@ import os
 import sys
 import pandas as pd
 
+def extract_shelf_transactions(input_path, output_path, min_count=10):
+    """
+    Extracts 'popular_shelves' from the metadata to create a transaction dataset.
+    Streams line-by-line to keep memory usage low.
+    """
+    print(f"Extracting transactions from {input_path}...")
 
-def filter_reviews(subset_path, review_dataset, output):
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+    book_count = 0
+    # Generic tags that add noise to discovery patterns
+    generic_tags = {
+        'to-read', 'currently-reading', 'owned', 'favorites',
+        'all-time-favorites', 'books-i-own', 'read-in-2017',
+        'read-in-2016', 'default', 'ebook', 'kindle', 'audiobook',
+        'my-books', 'library', 'wish-list', 'maybe', 'finish', 'read',
+        'to-own', 'currently-reading', 'i-own', 'on-my-shelf', 'dnf', 'my-personal-library',
+        're-read', 'tbr', 'tbr-pile', 'to read', 'currently reading', 'owned', 'favorites', 'all time favorites',
+        'books i own', 'default', 'ebook', 'kindle', 'audiobook', 'audiobooks',
+        'my books', 'library', 'wish list', 'maybe', 'finish', 'read', 'e book',
+        'hardcover', 'paperback', 'hardback', 'dnf', 'dnf d', 'shelfari favorites',
+        'owned books', 'favorite', 'paper', 'hardcopy', 'unfinished', 'duplicates',
+        'i own it', 'not read', 'read some day', 'own hard copy', 'in my home library',
+        'to-buy', 'audio', 'i-own', 'my library'
+    }
+
+    open_func = gzip.open if input_path.endswith('.gz') else open
+
+    with open_func(input_path, 'rt', encoding='utf-8') as fin, \
+         open(output_path, 'w', encoding='utf-8') as fout:
+
+        for line in fin:
+            try:
+                book = json.loads(line)
+                raw_shelves = book.get('popular_shelves', [])
+
+                
+            
+                filtered_shelves = [] 
+                   
+                for s in raw_shelves:
+                    try:
+                        count = int((s.get('count', 0)))
+                    except (ValueError, TypeError):
+                        continue
+
+                    if count < min_count:
+                        continue
+
+                    # 2. extract and normalize
+                    name = s.get('name', '').strip()
+                    if not name:
+                        continue
+
+                    #normalize for comparison
+                    norm = name.lower().replace('-', ' ').replace('_', ' ').strip()
+
+                    if norm.startswith('read in') or norm.startswith('read in-'):
+                        continue
+                    #3 filtering logic 
+                    if norm in generic_tags:
+                        continue
+                    if len(norm) <= 2 or norm.isdigit():
+                        continue
+
+                    filtered_shelves.append(name.replace(',', ' ').strip())
+                # Only save transactions with at  least 2 relevant tags
+                if len(filtered_shelves) > 1:
+                    book['popular_shelves'] = filtered_shelves
+                    fout.write(json.dumps(book) + '\n')
+                    book_count += 1
+
+                if book_count % 100000 == 0 and book_count > 0:
+                    print(f"Streamed {book_count} books...")
+            except (json.JSONDecodeError, ValueError):
+                continue
+
+    print(f"Done! Saved {book_count} transactions to {output_path}.")
+def filter_reviews(subset_path, nonadmin ,review_dataset, output):
     """
     1. Loads book_ids from already filtered metadata (created in main.py)
     2. Stremas the 11GB review file and saves only reviews for those books
     """
-
-    print(f"1. Loading book ids from {subset_path}")
+    print(f"0. Removing administrative tags from {subset_path}.")
+    extract_shelf_transactions(subset_path, nonadmin)
+    print(f"1. Loading book ids from {nonadmin}")
 
     book_ids = set()
 
-    with open(subset_path, 'r', encoding='utf-8') as f:
+    with open(nonadmin, 'r', encoding='utf-8') as f:
         for line in f:
             book = json.loads(line)
             book_ids.add(book['book_id'])
@@ -93,21 +171,23 @@ if __name__ == "__main__":
         sys.exit(1)
 
     subset = sys.argv[1]
-    reviews = sys.argv[2]
-    output = sys.argv[3]
-    csv = sys.argv[4]
+    nonadmin = sys.argv[2]
+    reviews = sys.argv[3]
+    output = sys.argv[4]
+
+    csv = sys.argv[5]
 
     if os.path.exists(subset) and os.path.exists(reviews):
-        #        with open('reviews_english.json', 'w') as fp:
-         #   pass
+        with open(nonadmin, 'w') as fp:
+            pass
         #print(f"Removing non-English from reviews and storing in a temp file reviews_english.json")    
         #remove_nonenglish(reviews, 'reviews_english.json', 2) # removes nonenglish and stores in a temp file
         #print(f"Removed Non-English from reviews and filtering reviews now")
-       filter_reviews(subset, reviews, output)
-       print(f"Formatting {output} to CSV and printing first 5 lines")
-       df = make_table(output, csv)
+        filter_reviews(subset, nonadmin, reviews, output)
+        print(f"Formatting {output} to CSV and printing first 5 lines")
+        df = make_table(output, csv)
 
-       if df is not None:
+        if df is not None:
            pass
     else:
         print("Error: Missing input files.")
