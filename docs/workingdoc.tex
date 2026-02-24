@@ -114,7 +114,6 @@ M4 & Weeks 14 & Text Mining (LDA), Final Report \\ \bottomrule
     \item Another challenge is the volume of data. The Goodreads dataset is comprised of multiple csv and jsons files that is multiple gigabytes compressed. Handling this in local memory will require using pandas chunking or focusing on smaller genre subsets. Text data can also be "noisy" and will require filtering to produce meaningful topics.
     \item Due to Goodreads' global reach our team expects to encounter non-English reviews, books, and shelf titles. Our team will have to strip any non-English text out of the datasets in order to prevent any of our proposed tests from failing.
 \end{itemize}
-
 \section{Milestone 2}
 
 This section details the work done for Milestone 2 of this data mining project.
@@ -122,17 +121,31 @@ This section details the work done for Milestone 2 of this data mining project.
 \subsection{Exploratory Data Analysis}
 
 In order to transition from the introductionary and theorteical discovery questions from the previous sections our team implemented multiple pipelines to select and transmit the raw data from the dataset.
- To address the first discovery question regarding the hidden assoications we wrote some python scripts. This script performs a keyword search across the "popular_shelves" attirbute of the `goodreads_books.json.gz` file. We spefically search for genres: 'romantasy', 'romantic-fantasy', 'fantasy-romance', 'romance', 'fantasy', and 'romantic'. The filtered results are stored in 01_filteredbooks.json. The resulting json consists of records: book_id, title, average_rating, shelves_list.
-    In order to answer discovery question 2 we need to example the different interactions users make so we exmaine interactions on books across the site along with the types of reviews. We implemented a second filtering script that utilizes the book_id from our previous script to perform an extraction from the goodreads_reviews_dedup.json.gz dataset. The extracted data is stored in 03_extractedreviews.csv
+ To address the first discovery question regarding the hidden assoications we wrote some python scripts. This script performs a keyword search across the "popular\_shelves" attirbute of the \texttt{goodreads\_books.json.gz} file. We spefically search for genres: 'romantasy', 'romantic-fantasy', 'fantasy-romance', 'romance', 'fantasy', and 'romantic'. The filtered results are stored in \texttt{01\_filteredbooks.json}. The resulting json consists of records: book\_id, title, average\_rating, shelves\_list.
 
-    \begin{figure}
-        \centering
-        \includegraphics[width=0.5\linewidth]{rating_histogram.png}
-        \caption{ Distribution ofboos  rating in 01_goodreadsbooks.csv}
-        \label{fig:placeholder}
-    \end{figure}
+In order to answer discovery question 2 we need to example the different interactions users make so we exmaine interactions on books across the site along with the types of reviews. We implemented a second filtering script that utilizes the book\_id from our previous script to perform an extraction from the \texttt{goodreads\_reviews\_dedup.json.gz} dataset. The extracted data is stored in \texttt{03\_extractedreviews.csv}.
 
-    Examining the histogram of the average ratings of th
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\linewidth]{rating_histogram.png}
+    \caption{Distribution of boos rating in 01\_goodreadsbooks.csv}
+    \label{fig:placeholder}
+\end{figure}
+
+    Examining the histogram of the average ratings of romance books in the 01_goodreadsbooks.csv we find that most readers rated the books around 4. This suggests that romance readers find books great reads. They often are not critical of books.
+
+\subsection{Univariate Analysis}
+
+Beyond the average ratings, our team examined the distribution of community-defined tags and the volume of review engagement.
+
+\subsubsection{Shelf Tag Distribution}
+
+Analysis of the shelves_list indicates that the tag 'to-read' is the most frequent attribute. During the preprocessing phase, we implemented a filter to only show tags that correspond to actually refer to book descriptions and not generic tags such as "to-read". However after during the postprocessing phase the most prevalent tags included fiction, romance, and fantasy. This aligns with the "Romatansy" genre which confirms Romantasy is the most pollinated genre.
+
+\subsubsection{Engagement Volume}
+
+
+
 \section*{Acknowledgment}
 The author would like to thank Julian McAuley for providing the Goodreads dataset and Kennesaw State University for the computational resources.
 
