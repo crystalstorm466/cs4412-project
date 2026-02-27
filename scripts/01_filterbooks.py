@@ -2,6 +2,8 @@ import json
 import gzip
 import os
 import sys
+
+# 01_filterbooks takes in the books dataset (contains all of the books in goodreads) and saves only romance books to the datset to create a romance subset
 def filter_goodreads_data(input_path, output_path, target_keywords):
     """
     Streams a large .json.gz file and filters records based on keywords
@@ -42,7 +44,9 @@ if __name__ == "__main__":
     # Update these paths to your actual local file locations
     input_file = "data/goodreads_books.json.gz"
     output_file = "data/romantasy_books_subset.json"
-    
+    if len(sys.argv) < 2:
+        print("Usage: python 01_filterbooks.py <goodreads_books.json.gz> <subset.json>")
+        sys.exit(1)
 
     input_file = sys.argv[1];
     output_file = sys.argv[2];

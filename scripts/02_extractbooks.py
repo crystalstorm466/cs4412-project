@@ -4,12 +4,11 @@ import os
 import sys
 import pandas as pd
 
-def extract_shelf_transactions(input_path, output_path, min_count=10):
-    """
-    Extracts 'popular_shelves' from the metadata to create a transaction dataset.
-    Streams line-by-line to keep memory usage low.
-    """
-    print(f"Extracting transactions from {input_path}...")
+# 02_extractbooks first removes all administrative tags like "to-read", "read" basically tags that wont tell use much data and just add noise and file size
+# This script normalizes shelve names from the first script. It removes the administrative tags
+def track_frequency(input_path, output_path, min_count=10):
+
+    print(f"Extracting tags from {input_path}...")
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
@@ -88,7 +87,7 @@ def filter_reviews(subset_path, nonadmin ,review_dataset, output):
     2. Stremas the 11GB review file and saves only reviews for those books
     """
     print(f"0. Removing administrative tags from {subset_path}.")
-    extract_shelf_transactions(subset_path, nonadmin)
+    track_frequency(subset_path, nonadmin)
     print(f"1. Loading book ids from {nonadmin}")
 
     book_ids = set()
@@ -167,18 +166,21 @@ def make_table(filtered_reviews, output):
 
 if __name__ == "__main__":
     if len(sys.argv) < 4:
-        print("Usage: python 02_extractbooks.py <subset_path.json> <reviews_dataset.json> <output.json> <output.csv>")
+        print("Usage: python 02_extractbooks.py <subset_path.json> <subset_path_noadmin.json> <reviews_dataset.json> <output.json> <output.csv>")
         sys.exit(1)
 
     subset = sys.argv[1]
     nonadmin = sys.argv[2]
     reviews = sys.argv[3]
     output = sys.argv[4]
-
     csv = sys.argv[5]
 
     if os.path.exists(subset) and os.path.exists(reviews):
         with open(nonadmin, 'w') as fp:
+            pass
+        with open(output, 'w') as fp:
+            pass
+        with open(csv, 'w') as fp:
             pass
         #print(f"Removing non-English from reviews and storing in a temp file reviews_english.json")    
         #remove_nonenglish(reviews, 'reviews_english.json', 2) # removes nonenglish and stores in a temp file

@@ -10,7 +10,7 @@ import gc
 from fim import fpgrowth
 import langid
 
-
+# Uses the FP-Growth algorithm to filter English only records, prepares shelf into transactional formats. Runs the FP-Growth algorithm to discover associatiosn between genres w/ metrics and support, confidence and lift
 MAX_SHELVES = 5000
 
 def is_english(text):
@@ -145,7 +145,7 @@ def run_association_mining(transaction_file, min_support=0.01, min_threshold=1.2
 
 if __name__ == "__main__":
     if len(sys.argv) < 4:
-        print("Usage: python extract_shelves.py <input_json> <temp_csv> <output_csv>")
+        print("Usage: python 04_association.py <input_json> <temp_csv> <output_csv>")
         sys.exit(1)
 
     input_file = sys.argv[1]

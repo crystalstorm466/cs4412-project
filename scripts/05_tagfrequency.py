@@ -4,11 +4,12 @@ import json
 import os
 from collections import Counter
 
+# Performs a frequency analysis of user-defined tag. Counts how many times one appears in a book and saves to a csv and picture
+
 def tag(inputjson, outputcsv):
     tags_counts = Counter()
 
     print(f"reading {inputjson} to measure tag")
-
     with open(inputjson, 'r', encoding='utf-8') as f:
         for line in f:
             try:

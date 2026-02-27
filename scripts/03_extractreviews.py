@@ -5,6 +5,9 @@ import os
 import sys
 import pandas as pd
 
+#Uses goodreads_reviews_dedup.json.gz dataset to stream throught the massive 11GB fiile (millions of reviews)
+# isolates only the matching bookids from the subset created in 01_filterbooks.py
+# output: produces a dataset of individua user reviews spefically for the books in the subset
 
 def filter_reviews(subset_path, review_dataset, output):
     """

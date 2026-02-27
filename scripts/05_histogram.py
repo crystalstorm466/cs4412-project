@@ -4,6 +4,10 @@ import os
 import sys
 import json
 import gzip
+
+#visualization
+#reads a CSV file generates a Distribution histogram of book ratings, calculates the mean value, stores result as "rating_histogram.png"
+
 def histogram(path):
     if not os.path.exists(path):
         print(f"error: File {path} does not exist. Please try again")
@@ -63,14 +67,14 @@ def histogram_gz(path):
         except:
             print("an error occured")
 
-        print(f"Processed {len(count)}")
+        print(f"Processed {count}")
 
 
     plt.figure(figsize=(10,6))
     plt.hist(data_points, bins=40, color="#008080", edgecolor='black', alpha=0.7)
 
-    clean_title= value.replace('_', ' ').title()
-    plt.title(f'Average Ratings of goodreads_books.json.gz', fontsize=14, fontweight='bold')
+    clean_title= 'average_rating'.replace('_', ' ').title()
+    plt.title(f'Average Ratings of {path}', fontsize=14, fontweight='bold')
     plt.xlabel(clean_title, fontsize=12)
     plt.ylabel('Frequency', fontsize=12)
     plt.grid(axis='y', alpha=0.3)
