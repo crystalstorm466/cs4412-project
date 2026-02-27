@@ -26,7 +26,7 @@ def track_frequency(input_path, output_path, min_count=10):
         'hardcover', 'paperback', 'hardback', 'dnf', 'dnf d', 'shelfari favorites',
         'owned books', 'favorite', 'paper', 'hardcopy', 'unfinished', 'duplicates',
         'i own it', 'not read', 'read some day', 'own hard copy', 'in my home library',
-        'to-buy', 'audio', 'i-own', 'my library'
+        'to-buy', 'audio', 'i-own', 'my library', 'to-buy', 'to buy', 'ebooks', 'kindle'
     }
 
     open_func = gzip.open if input_path.endswith('.gz') else open
@@ -129,32 +129,37 @@ def flatten_shelves(shelves_list):
 def make_table(filtered_reviews, output):
     print(f"Loading filtered books from {filtered_reviews}")
     try:
+        chunk_size = 100000
+        first_chunk = True
+        for chunk in pd.read_json(filtered_reviews, lines=True, chunksize=chunk_size):
 
-        df = pd.read_json(filtered_reviews, lines=True)
-        print(f"Successfully loaded {len(df)} books ")
-        if 'review_text' in df.columns:
-            df['review_length'] = df['review_text'].str.len()
-            # Create a snippet for the console preview only
-            df['review_snippet'] = df['review_text'].str.replace('\n', ' ', regex=False).str[:75] + "..."
+            if 'review_text' in chunk.columns:
+                chunk['review_length'] = chunk['review_text'].str.len()
+                # Create a snippet for the console preview only
+                chunk['review_snippet'] = chunk['review_text'].str.replace('\n', ' ', regex=False).str[:75] + "..."
 
-        if 'popular_shelves' in df.columns:
-            df['shelves_list'] = df['popular_shelves'].apply(flatten_shelves)
-        if 'authors' in df.columns:
-            df['primary_author'] = df['authors'].apply(lambda x: x[0]['author_id'] if x else "")
+            if 'popular_shelves' in chunk.columns:
+                chunk['shelves_list'] = chunk['popular_shelves'].apply(flatten_shelves)
+            if 'authors' in chunk.columns:
+                chunk['primary_author'] = chunk['authors'].apply(lambda x: x[0]['author_id'] if x else "")
 
-        cols_to_show = ['book_id', 'user_id', 'title', 'rating', 'average_rating', 'n_votes', 'n_comments', 'review_length', 'shelves_list','review_snippet']
-        existing_cols = [c for c in cols_to_show if c in df.columns]
+            cols_to_show = ['book_id', 'user_id', 'title', 'rating', 'average_rating', 'n_votes', 'n_comments', 'review_length', 'shelves_list','review_snippet']
+            existing_cols = [c for c in cols_to_show if c in chunk.columns]
 
-        working_df = df[existing_cols]
+            working_df = chunk[existing_cols]
 
+            if 'review_length' in working_df.columns:
+                working_df = working_df[working_df['review_length'] > 5]
 
-        if 'review_length' in working_df.columns:
-            working_df = working_df[working_df['review_length'] > 5]
-
-        print(working_df.head().to_string(index=False))
+            print(working_df.head().to_string(index=False))
 
 
-        working_df.to_csv(output, index=False)
+            working_df.to_csv(output, index=False)
+
+            if first_chunk:
+                print(working_df.head().to_string(index=False))
+                first_chunk = False
+
         print(f"\nSuccess! Readable results saved to: {output}")
         return working_df
 

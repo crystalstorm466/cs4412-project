@@ -3,6 +3,7 @@ import pandas as pd
 import json 
 import os
 from collections import Counter
+import matplotlib.pyplot as plt
 
 # Performs a frequency analysis of user-defined tag. Counts how many times one appears in a book and saves to a csv and picture
 
@@ -30,8 +31,20 @@ def tag(inputjson, outputcsv):
 
             except json.JSONDecodeError:
                 continue
-
     df = pd.DataFrame(tags_counts.most_common(50), columns=['Tag', 'Book Count'])
+    top_10 = df.head(10)
+    plt.figure(figsize=(10,8))
+    plt.bar(top_10['Tag'], top_10['Book Count'])
+
+    # plt.bar(top_10['Book Count'],
+    #         labels=top_10['Tag'],
+    #         autopct='%1.1f%%',
+    #         startangle=140,
+    #         colors=plt.cm.Paired.colors)
+    plt.title('Top 10 most common shelf tags', fontsize=14)
+
+    plt.savefig('docs/frequentpiechart.png', dpi=300, bbox_inches='tight')
+    plt.show()
 
     df.to_csv(outputcsv, index=False)
 

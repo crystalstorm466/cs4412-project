@@ -65,8 +65,17 @@ def extract_shelf_transactions(input_path, output_path, min_count=10):
         'to-read', 'currently-reading', 'owned', 'favorites',
         'all-time-favorites', 'books-i-own', 'read-in-2017',
         'read-in-2016', 'default', 'ebook', 'kindle', 'audiobook',
-        'my-books', 'library', 'wish-list', 'maybe', 'finish', 'read'
-    }
+        'my-books', 'library', 'wish-list', 'maybe', 'finish', 'read',
+        'to-own', 'currently-reading', 'i-own', 'on-my-shelf', 'dnf', 'my-personal-library',
+        're-read', 'tbr', 'tbr-pile', 'to read', 'currently reading', 'owned', 'favorites', 'all time favorites',
+        'books i own', 'default', 'ebook', 'kindle', 'audiobook', 'audiobooks',
+        'my books', 'library', 'wish list', 'maybe', 'finish', 'read', 'e book',
+        'hardcover', 'paperback', 'hardback', 'dnf', 'dnf d', 'shelfari favorites',
+        'owned books', 'favorite', 'paper', 'hardcopy', 'unfinished', 'duplicates',
+        'i own it', 'not read', 'read some day', 'own hard copy', 'in my home library',
+        'to-buy', 'audio', 'i-own', 'my library'
+        }
+
 
     open_func = gzip.open if input_path.endswith('.gz') else open
 
@@ -78,13 +87,13 @@ def extract_shelf_transactions(input_path, output_path, min_count=10):
                 book = json.loads(line)
 
                 # Filter tags based on community frequency
-                shelves = [
-                    s['name'].replace(',', ' ').strip()
-                    for s in book.get('popular_shelves', [])
-                    if int(s['count']) >= min_count
-                ]
-
-                # Remove administrative/utility tags
+                shelves =[]
+                for s in book.get('popular_shelves', []):
+                    if (isinstance(s, dict)):
+                        if int(s.get('count', 0)) >= min_count:
+                            shelves.append(s.get('name', '').replace(',', ' ').strip())                # Remove administrative/utility tags
+                    elif isinstance(s, str):
+                        shelves.append(s.replace(',', ' ').strip())
                 filtered_shelves = [s for s in shelves if s.lower() not in generic_tags]
 
                 # Only save transactions with at least 2 relevant tags
