@@ -13,7 +13,7 @@
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 
-\title{M1 Data Mining Project Proposal: Analyzing Reader Patterns and Genre Associations in the Goodreads Dataset*\\
+\title{Data Mining Project: Analyzing Reader Patterns and Genre Associations in the Goodreads Dataset*\\
 {\footnotesize \textsuperscript{*} CS 4412: Data Mining}
 \thanks{Identify applicable funding agency here. If none, delete this.}
 }
@@ -66,7 +66,7 @@ Known issues include many user-defined shelves that share common tags like "to-r
 
 This project moves beyond prediction models to investigate the following questions the team had:
 \begin{itemize}
-    \item What are the hidden associations between specfic book genres and user-defined "shelves"? (Do readers of "Romantasy (Romance Fantasy) also show high interset in "Historical Romance" or other fantsay genres?)
+    \item What are the hidden associations between specfic book genres and user-defined "shelves"? (Do readers of "Romantasy" (Romance Fantasy) also show high interset in other genres like fantasy?
     \item Can we identify distinct Reader Personas based on interaction metrics? By clustering users based on their average rating variance, review frequency, and review length our goal is to discover if it is possible to classify readers as a critical reviewer or casual consumer.
     \item What type of patterns emerge from highly-voted reviews compared to low-voted ones?
 \end{itemize}
@@ -76,13 +76,23 @@ The analysis will follow a multistage data mining pipeline as visualized in Figu
 
 \begin{figure}[htbp]
   \centering
-  \framebox{\parbox{0.45\textwidth}{\centering
-    \vspace{1.5cm}
+  \framebox{\parbox{0.5\textwidth}{\centering
+    \vspace{0.5cm}
     \textbf{Analysis Pipeline Diagram} \\
-    \small\textit{JSON Parsing $\rightarrow$ Cleaning $\rightarrow$ Feature Extraction $\rightarrow$ [Mining Modules] $\rightarrow$ Evaluation}
-    \vspace{1.5cm}
+    \vspace{0.5cm}
+    \small
+    \textbf{1. Data Ingestion:} Books \& Reviews JSON Parsing \\
+    $\downarrow$ \\
+    \textbf{2. Preprocessing:} Admin Tag Cleaning \& Language Filtering \\
+    $\downarrow$ \\
+    \textbf{3. Mining Modules \& Evaluation:}\\
+    \vspace{0.2cm}
+    $\rightarrow$ \textit{Shelf Tags} $\Rightarrow$ \textbf{FP-Growth} $\Rightarrow$ Genre Associations (DQ1) \\
+    $\rightarrow$ \textit{User Metrics} $\Rightarrow$ \textbf{K-Means} $\Rightarrow$ Reader Personas (DQ2) \\
+    $\rightarrow$ \textit{Review Text} $\Rightarrow$ \textbf{LDA} $\Rightarrow$ Helpfulness Patterns (DQ3) \\
+    \vspace{0.5cm}
   }}
-  \caption{Planned Data Mining Workflow.}
+  \caption{Planned Data Mining Workflow mapping specific data features to their respective algorithms and discovery questions.}
   \label{fig:pipeline}
 \end{figure}
 
@@ -114,26 +124,28 @@ M4 & Weeks 14 & Text Mining (LDA), Final Report \\ \bottomrule
     \item Another challenge is the volume of data. The Goodreads dataset is comprised of multiple csv and jsons files that is multiple gigabytes compressed. Handling this in local memory will require using pandas chunking or focusing on smaller genre subsets. Text data can also be "noisy" and will require filtering to produce meaningful topics.
     \item Due to Goodreads' global reach our team expects to encounter non-English reviews, books, and shelf titles. Our team will have to strip any non-English text out of the datasets in order to prevent any of our proposed tests from failing.
 \end{itemize}
+
 \section{Milestone 2}
 
 This section details the work done for Milestone 2 of this data mining project.
 
 \subsection{Preprocessing and Data Transformation}
 
-In order to transition from the introductory and theorteical discovery questions from the previous sections our team implemented multiple scripts to select and gather the raw data from the dataset.
- To address the first discovery question regarding the hidden associations we wrote some python scripts to filter the massive dataset. These scripts took a while to run our computer. First we performed a keyword search across the "popular\_shelves" attirbute of the \texttt{goodreads\_books.json.gz} file. We spefically search for genres: 'romantasy', 'romantic-fantasy', 'fantasy-romance', 'romance', 'fantasy', and 'romantic'. The filtered results are stored in \texttt{01\_filteredbooks.json}. The resulting json consists of records: book\_id, title, average\_rating, shelves\_list.
+In order to transition from the introductory and theoretical discovery questions from the previous sections our team implemented multiple scripts to select and gather the raw data from the dataset.
+ To begin answersing our discovery questions we will need to preprocess our data through a python code to filter the massive dataset by cleaning some administrative tags and filtering out non-English languages. First we performed a keyword search across the "popular\_shelves" attribute of the \texttt{goodreads\_books.json.gz} file. We specifically search for genres: 'romantasy', 'romantic-fantasy', 'fantasy-romance', 'romance', 'fantasy', and 'romantic'. The filtered results are stored in \texttt{01\_filteredbooks.json}. The resulting json consists of records: book\_id, title, average\_rating, shelves\_list.
 
 
-To answer discovery question 2, we need to examine the different user interactions, so we implemented a second filtering script utilizing the book\_id from our previous script to extract reviews from the \texttt{goodreads\_reviews\_dedup.json.gz} dataset, storing the output in \texttt{03\_extractedreviews.csv}.
+To answer discovery question 1, we need to examine the different user interactions, so we implemented a second filtering script utilizing the book\_id from our previous script to extract reviews from the \texttt{goodreads\_reviews\_dedup.json.gz} dataset, storing the output in \texttt{03\_extractedreviews.csv}.
 
-The datasets required significant cleaning before our team could conduct meaningful mining. First, we removed generic administrative tags like `to-read' and `ebooks' from the books dataset to reduce noise. Second, to focus our analysis and ensure data comprehension, we removed any non-English records from the reviews dataset using the Python package \texttt{langid}.
+The datasets required significant cleaning before our team could conduct meaningful mining. First, we removed generic administrative tags like \texttt{`to-read'} and \texttt{`ebooks'} from the books dataset to reduce noise. Second, to focus our analysis and ensure data comprehension, we removed any non-English records from the reviews dataset using the Python package \texttt{langid}.
+
 \subsection{Exploratory Data Analysis}
 Before applying our mining algorithms, our team examined the distributions of ratings, community-defined tags (for example users can create virtual bookshelves and give them a name), and review engagement to establish a baseline understanding of the ``Romantasy'' and other romance genres subset.
 
  \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\linewidth]{rating_histogram.png}
-    \caption{Distribution of boos rating in 01\_goodreadsbooks.csv}
+    \caption{Distribution of books rating in 01\_goodreadsbooks.csv}
     \label{fig:placeholder}
 \end{figure}
 
@@ -149,21 +161,60 @@ Analysis of the shelves\_list indicates that the tag `to-read' is the most frequ
     \label{fig:tag_frequencies}
 \end{figure}
 
-In order to answer discovery question 1 we need to example the different interactions users make so we examine interactions on books across the site along with the types of reviews. We implemented a second filtering script that utilizes the book\_id from our previous script to perform an extraction from the \texttt{goodreads\_reviews\_dedup.json.gz} dataset. The extracted data is stored in \texttt{03\_extractedreviews.csv}.
+
+
+\subsubsection{Engagement Volume}
+Beyond genre tags and ratings, we extracted user engagement metrics from the \texttt{goodreads\_reviews\_dedup.json.gz} dataset to identify behavioral patterns. A Pearson correlation analysis reveals a notable moderate positive correlation of $0.52$ between the number of comments (\texttt{n\_comments}) and the number of votes (\texttt{n\_votes}), suggesting that reviews sparking discussion are also more likely to be perceived as helpful or popular. Conversely, our initial hypothesis that \texttt{review\_length} would drive higher engagement was unsupported, as it maintained negligible correlations with both \texttt{n\_votes} ($0.03$) and \texttt{n\_comments} ($0.04$). Furthermore, the numerical \texttt{rating} appears entirely decoupled from interaction volume, showing correlations of $0.00$ and $-0.01$ against votes and comments, respectively. These results indicate that while social interactions (voting and commenting) tend to scale together, they are driven by factors other than the sentiment of the rating or the verbosity of the review.
+
+\begin{figure}[hbtp]
+    \centering
+    \includegraphics[width=0.8\linewidth]{correlation_heatmap.png}
+    \caption{Correlation Heatmap of User Engagement Metrics}
+    \label{fig:user_engagement}
+\end{figure}
+
+Visualizing this relationship via a scatterplot (Figure \ref{fig:engagement_scatter}) confirms the heatmap findings. While the majority of reviews cluster near the origin of the graph, there is a clear positive trend where reviews exceeding $1,000$ votes frequently receive over $150$ comments. These results indicate that while social interactions (voting and commenting) tend to scale together, they are driven by community relevance of a review rather than the sentiment of the rating or the content of a certain book.
+\begin{figure}[hbtp]
+    \centering
+    \includegraphics[width=0.8\linewidth]{scatterplot_commentvotes.png}
+    \caption{Scatterplot of Comments vs. Votes}
+    \label{fig:engagement_scatter}
+\end{figure}
+
 
 \subsection{Answering Discovery Question 1: Genre Associations}
 
 Our team originally asked if readers of ``Romantasy'' (Romance Fantasy) also showed high interest in other specific romance sub-genres. After running the FP-Growth algorithm on our transaction data, the top association rules generated lift values of approximately 6.8 to 7.0 for various fantasy sub-genres, rather than romance genres.
 
-While we did not see strong associations between romance genres at our current minimum support threshold of 0.01, our findings partially support the broader hypothesis of sub-genre cross-pollination. Specifically, we demonstrated that readers of fantasy are highly likely to read and tag other closely related speculative fiction genres. This is evidenced by the strong associations found between ``paranormal'' and ``supernatural'' fiction, as well as the heavy overlap between fantasy and science fiction readers.
+\begin{table}[htbp]
+\caption{Top Discovered Genre Association Rules by Lift}
+\begin{center}
+\begin{tabular}{@{}llcc@{}}
+\toprule
+\textbf{Antecedents} & \textbf{Consequents} & \textbf{Lift} & \textbf{Support} \\ \midrule
+\{paranormal, fiction\} & \{supernatural\} & 7.59 & 0.088 \\
+\{favourites, novels\} & \{novel\} & 6.93 & 0.081 \\
+\{novels, adult\} & \{adult-fiction\} & 6.44 & 0.082 \\
+\{paranormal, fantasy\} & \{supernatural\} & 6.23 & 0.093 \\ \bottomrule
+\end{tabular}
+\label{tab:association_rules}
+\end{center}
+\end{table}
+
+While we did not see strong associations between romance genres at our current minimum support threshold of 0.08, our findings strongly support the broader hypothesis of sub-genre cross-pollination. As shown in Table \ref{tab:association_rules} readers of fantasy and fiction are highly tag other related genres. This is evidenced by the strong associations found between ``paranormal'' and ``supernatural'' fiction yielding a high lift of 7.59. Another pattern we observed is the overlap between ``paranormal`` and fantasy yielding a high lift of 6.23 which confirms that sub-genre crossover pollination is a real thing.
+
+\begin{figure}[hbtp]
+    \centering
+    \includegraphics[width=\linewidth]{04_associationrules.png}
+    \caption{Genre Associations}
+    \label{fig:association_rules}
+\end{figure}
 
 
 \subsection{Univariate Analysis}
 
 Beyond the average ratings, our team examined the distribution of community-defined tags and the volume of review engagement.
 
-
-\subsubsection{Engagement Volume}
 
 \section{Updated Plan for Milestone 3}
 
