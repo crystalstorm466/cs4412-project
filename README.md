@@ -45,7 +45,7 @@ Windows/Linux
 # M2: Inital Implementation
 
 
-To access the Jupyter Notebook
+To access the Jupyter Notebook. All code can be ran in the jupyter notebook.
 
 For all platforms:
 
