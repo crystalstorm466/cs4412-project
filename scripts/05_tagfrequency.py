@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 # Performs a frequency analysis of user-defined tag. Counts how many times one appears in a book and saves to a csv and picture
 
-def tag(inputjson, outputcsv):
+def tag(inputjson, outputcsv, outputpng):
     tags_counts = Counter()
 
     print(f"reading {inputjson} to measure tag")
@@ -43,7 +43,7 @@ def tag(inputjson, outputcsv):
     #         colors=plt.cm.Paired.colors)
     plt.title('Top 10 most common shelf tags', fontsize=14)
 
-    plt.savefig('docs/frequentpiechart.png', dpi=300, bbox_inches='tight')
+    plt.savefig(outputpng, dpi=300, bbox_inches='tight')
     plt.show()
 
     df.to_csv(outputcsv, index=False)
@@ -59,9 +59,9 @@ def tag(inputjson, outputcsv):
 if __name__ == "__main__":
     input_file = sys.argv[1]
     output = sys.argv[2]
-
+    png = sys.argv[3]
 
     if os.path.exists(input_file):
-        tag(input_file, output)
+        tag(input_file, output,png)
     else:
          print(f"Error: {input_file} not found. Please run your extraction script first.")

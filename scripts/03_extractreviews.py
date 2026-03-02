@@ -9,6 +9,80 @@ import pandas as pd
 # isolates only the matching bookids from the subset created in 01_filterbooks.py
 # output: produces a dataset of individua user reviews spefically for the books in the subset
 
+def clean_admin_tags(input_path, output_path, min_count=10):
+    print(f"Extracting and cleaning tags from {input_path}...")
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    book_count = 0
+
+    # Generic tags that add noise to discovery patterns
+    generic_tags = {
+        'to-read', 'currently-reading', 'owned', 'favorites',
+        'all-time-favorites', 'books-i-own', 'read-in-2017',
+        'read-in-2016', 'default', 'ebook', 'kindle', 'audiobook',
+        'my-books', 'library', 'wish-list', 'maybe', 'finish', 'read',
+        'to-own', 'currently-reading', 'i-own', 'on-my-shelf', 'dnf', 'my-personal-library',
+        're-read', 'tbr', 'tbr-pile', 'to read', 'currently reading', 'owned', 'favorites', 'all time favorites',
+        'books i own', 'default', 'ebook', 'kindle', 'audiobook', 'audiobooks',
+        'my books', 'library', 'wish list', 'maybe', 'finish', 'read', 'e book',
+        'hardcover', 'paperback', 'hardback', 'dnf', 'dnf d', 'shelfari favorites',
+        'owned books', 'favorite', 'paper', 'hardcopy', 'unfinished', 'duplicates',
+        'i own it', 'not read', 'read some day', 'own hard copy', 'in my home library',
+        'to-buy', 'audio', 'i-own', 'my library', 'to-buy', 'to buy', 'ebooks', 'kindle',
+        'currently reading',
+    }
+
+    with open(input_path, 'rt', encoding='utf-8') as fin, \
+         open(output_path, 'w', encoding='utf-8') as fout:
+
+        for line in fin:
+            try:
+                book = json.loads(line)
+                raw_shelves = book.get('popular_shelves', [])
+                filtered_shelves = []
+
+                for s in raw_shelves:
+                    try:
+                        count = int((s.get('count', 0)))
+                    except (ValueError, TypeError):
+                        continue
+
+                    if count < min_count:
+                        continue
+
+                    name = s.get('name', '').strip()
+                    if not name:
+                        continue
+
+                    # normalize for comparison
+                    norm = name.lower().replace('-', ' ').replace('_', ' ').strip()
+
+                    if norm.startswith('read in'):
+                        continue
+                    if norm in generic_tags or len(norm) <= 2 or norm.isdigit():
+                        continue
+
+                    filtered_shelves.append(name.replace(',', ' ').strip())
+
+                # Only save books that still have at least 2 relevant tags left
+                if len(filtered_shelves) > 1:
+                    book['popular_shelves'] = filtered_shelves
+                    fout.write(json.dumps(book) + '\n')
+                    book_count += 1
+
+                if book_count % 50000 == 0 and book_count > 0:
+                    print(f"Cleaned {book_count} books...")
+            except (json.JSONDecodeError, ValueError):
+                continue
+
+    print(f"Done! Saved {book_count} clean books to {output_path}.")
+
+def flatten_shelves(shelves_list):
+    """Helper to turn list of strings into a clean string: 'tag1, tag2, tag3'"""
+    if not isinstance(shelves_list, list):
+        return ""
+    return ", ".join(shelves_list[:10])
+
+
 def filter_reviews(subset_path, review_dataset, output):
     """
     1. Loads book_ids from already filtered metadata (created in main.py)
@@ -29,8 +103,9 @@ def filter_reviews(subset_path, review_dataset, output):
 
     count = 0
     saved = 0
+    open_func = gzip.open if review_dataset.endswith('.gz') else open
 
-    with gzip.open(review_dataset, mode="rt", encoding='utf-8') as fin, \
+    with open_func(review_dataset, mode="rt", encoding='utf-8') as fin, \
             open(output, 'w', encoding='utf-8') as fout:
 
 
@@ -46,41 +121,42 @@ def filter_reviews(subset_path, review_dataset, output):
 
     print(f"Done! saved {saved} reviews to {output}")
 
-def flatten_shelves(shelves_list):
-    """Helper to turn list of dicts into a clean string: 'tag1, tag2, tag3'"""
-    if not isinstance(shelves_list, list):
-        return ""
-    # Extract just the 'name' and join them with commas
-    return ", ".join([s['name'] for s in shelves_list[:10]]) # Limit to top 10 for readability
 
 def make_table(filtered_reviews, output):
-    print(f"Loading filtered reviews from {filtered_reviews}")
+    print(f"Loading filtered reviews from {filtered_reviews} in chunks...")
     try:
+        chunk_size = 100000
+        first_chunk = True
+        total_processed = 0
 
-        df = pd.read_json(filtered_reviews, lines=True)
-        print(f"Successfully loaded {len(df)} reviews ")
-        if 'review_text' in df.columns:
-            # Replace newlines with spaces and truncate to 100 chars
-            df['review_snippet'] = df['review_text'].str.replace('\n', ' ', regex=False).str[:100] + "..."
+        # Read the file in chunks of 100,000 rows
+        for chunk in pd.read_json(filtered_reviews, lines=True, chunksize=chunk_size):
+            if 'review_text' in chunk.columns:
+                # Replace newlines with spaces and truncate to 100 chars
+                chunk['review_snippet'] = chunk['review_text'].str.replace('\n', ' ', regex=False).str[:100] + "..."
 
-        cols_to_show = ['book_id', 'user_id', 'rating', 'n_votes', 'n_comments', 'review_snippet']
-        existing_cols = [c for c in cols_to_show if c in df.columns]
+            cols_to_show = ['book_id', 'user_id', 'rating', 'n_votes', 'n_comments', 'review_snippet']
+            existing_cols = [c for c in cols_to_show if c in chunk.columns]
 
+            working_df = chunk[existing_cols]
 
-        working_df = df[existing_cols]
-        print(working_df.head().to_string(index=False))
+            # If it's the first chunk, write with headers. Otherwise, append without headers.
+            if first_chunk:
+                working_df.to_csv(output, index=False, mode='w')
+                print(working_df.head().to_string(index=False))
+                first_chunk = False
+            else:
+                working_df.to_csv(output, index=False, mode='a', header=False)
 
+            total_processed += len(working_df)
+            print(f"Processed and appended {total_processed} reviews to CSV...")
 
-        working_df.to_csv(output, index=False)
         print(f"\nSuccess! Readable results saved to: {output}")
-        return working_df
-
+        return True
 
     except Exception as e:
         print(f"Failed to load JSON: {e}")
         return None
-
-
 if __name__ == "__main__":
     if len(sys.argv) < 4:
         print("Usage: python reviews.py <subset_path.json> <reviews_dataset.json> <output.json> <output.csv>")

@@ -15,10 +15,11 @@ def filter_goodreads_data(input_path, output_path, target_keywords):
 
     # Ensure output directory exists
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    open_func = gzip.open if input_path.endswith('.gz') else open
 
-    with gzip.open(input_path, 'rt', encoding='utf-8') as fin, \
+    with open_func(input_path, 'rt', encoding='utf-8') as fin, \
          open(output_path, 'w', encoding='utf-8') as fout:
-        
+
         for line in fin:
             count += 1
             book = json.loads(line)
