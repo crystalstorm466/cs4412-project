@@ -3,7 +3,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 # 1. Load the dataset
-df_reviews = pd.read_csv('data/03_extractedreviews.csv')
+df_reviews = pd.read_csv('../data/03_extractedreviews.csv')
 
 # 2. Ensure we have a review_length column (calculate it if missing)
 if 'review_length' not in df_reviews.columns:
@@ -40,5 +40,5 @@ plt.title('Correlation Heatmap of User Engagement Metrics', fontsize=14)
 plt.tight_layout()
 
 # 8. Save and show the plot
-plt.savefig('correlation_heatmap.png')
+plt.savefig('../docs/correlation_heatmap.png')
 plt.show()

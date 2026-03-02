@@ -1,9 +1,10 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+import sys
 # 1. Load the association rules
-df_rules = pd.read_csv('data/04_association.csv')
+input_fil = sys.argv[1]
+df_rules = pd.read_csv(input_fil)
 
 # 2. Set up the figure size
 plt.figure(figsize=(10, 6))

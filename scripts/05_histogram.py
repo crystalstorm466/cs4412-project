@@ -41,7 +41,7 @@ def histogram(path):
     plt.legend()
 
     # 5. Save and Show
-    output_img = 'docs/rating_histogram.png'
+    output_img = '../docs/rating_histogram.png'
     plt.savefig(output_img, dpi=300, bbox_inches='tight')
     plt.show()
 
@@ -79,7 +79,7 @@ def histogram_gz(path):
     plt.ylabel('Frequency', fontsize=12)
     plt.grid(axis='y', alpha=0.3)
 
-    output = "docs/globalaverageratings.png"
+    output = '../docs/rating_histogram.png'
     plt.savefig(output, dpi=300, bbox_inches='tight')
     plt.show()
 

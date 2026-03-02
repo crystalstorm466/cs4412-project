@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # 1. Load the association rules
-df_rules = pd.read_csv('data/03_extractedreviews.csv')
+df_rules = pd.read_csv('../data/03_extractedreviews.csv')
 
 # 2. Set up the figure size
 plt.figure(figsize=(12, 6))
@@ -28,5 +28,5 @@ plt.ylabel('n_votes', fontsize=12)
 
 # 5. Show and save the plot
 plt.tight_layout()
-plt.savefig('scatterplot_extractedreviews.png')
+plt.savefig('../docs/scatterplot_extractedreviews.png')
 plt.show()
