@@ -50,5 +50,5 @@ To access the Jupyter Notebook. All code can be ran in the jupyter notebook.
 For all platforms:
 
 ```sh
-   jupyter lab
+   jupyter notebook
 ```
