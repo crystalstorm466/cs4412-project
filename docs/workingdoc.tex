@@ -154,7 +154,10 @@ Examining the histogram of the average ratings of romance books in the 01\_goodr
 
 \subsubsection{Shelf Tag Distribution}
 
-Analysis of the shelves\_list indicates that the tag `to-read' is the most frequent attribute. During the preprocessing phase, we implemented a filter to only show tags that correspond to actually refer to book descriptions and not generic tags such as ``to-read''. However after during the postprocessing phase the most prevalent tags included fiction, romance, and fantasy. This aligns with the ``Romatansy'' genre which confirms Romantasy is the most pollinated genre.
+Analysis of the raw \texttt{shelves\_list} indicated that administrative tags like `to-read' originally dominated the dataset. During the preprocessing phase, we implemented a filter to remove these generic administrative tags to ensure our algorithms would focus on actual book shelves.
+
+As shown in Figure \ref{fig:tag_frequencies}, the most prevalent tags post-cleaning include massive macro-genres such as fiction, romance, and fantasy. Establishing this baseline distribution is critical, as it directly foreshadows our findings for Discovery Question 1, where our association rule mining revealed that the community heavily favors cross-tagging with these broad, overarching categories rather than niche sub-genres.
+
 \begin{figure}[hbtp]
     \centering
     \includegraphics[width=\linewidth]{10commonbargraph.png}
@@ -164,7 +167,51 @@ Analysis of the shelves\_list indicates that the tag `to-read' is the most frequ
 
 
 
-\subsubsection{Engagement Volume}
+\subsection{Answering Discovery Question 1: Genre Associations}
+
+Our team originally proposed if readers of ``Romantasy'' (Romance Fantasy) also showed high interest in other specific romance sub-genres. During our inital run developing our implementation for Milestone 2 our FP-Growth algorithm generated relationships based off structural administrative tags rather than genre relationships like romance. Furthermore, variations in user-generated text caused our target genre to be heavily diluted. To correct this for Milestone 3, we implemented a data normalization pipeline to aggregate variations of Romantasy (e.g., ``fantasy romance'', ``paranormal romance'') into standardized categories. We also significantly lowered our algorithm parameters, dropping the minimum support threshold to 0.01 (1\% of transactions) and the minimum lift threshold to 2, to ensure we were not filtering out niche sub-genre connections.
+
+
+\begin{table}
+\caption{Top Discovered Genre Association Rules (Min Support = 0.01)}
+\label{tab:association_rules_m3}
+\begin{tabular}{llcc}
+\toprule
+antecedents & consequents & lift & support \\
+\midrule
+{supernatural} & {vampire, paranormal-fantasy} & 7.520000 & 0.019000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+Even with our highly sensitive thresholds and normalized data, the dataset did not support our inital hypothesis. The FP-Growth algorithm did not find any strong association rules linking 'Romantasy' or other related genres to other specific categories. This suggests that users who tag books with 'Romantasy' tend to treat it as a standalone category. Cross-tagging these books they tend to be associated with broad labels. This null result provides a clear answer to our first discovery question: Readers do not typically engage in sub-genre cross-pollination within the romance category. Instead, ``Romantasy'' serves as a descriptive tag for these users.
+
+\begin{figure}[hbtp]
+    \centering
+    \includegraphics[width=\linewidth]{04_associationrules.png}
+    \caption{Genre Associations}
+    \label{fig:association_rules}
+\end{figure}
+
+
+
+
+\section{Milestone 3}
+
+Moving into Milestone 3, our plan remains aligned with the original Milestone 1 proposal. Since we have successfully established our preprocessing pipeline and validated our association rules, our next focus will be applying K-Means clustering to answer our second discovery question. We will collect user interactions from rating variance and review length—to identify distinct reader categories (e.g., casual consumers vs. critical reviewers). Additionally, we will begin exploring Latent Dirichlet Allocation (LDA) for text mining the review bodies.
+
+\subsection{Results/Pattern Discovery}
+
+\subsection{Discovery Question 2: Reader Personas}
+
+For the second discovery question our team asked if we could categorize users as a "critical reviewer" or a "casual consumer" based off average rating variance, review frequency, and review length. In order to measure these users, our team developed a K Means analysis using Elbow charts to create 4 clusters of users based off {review_frequency, avg_rating, rating_variance}.
+
+Based on our K-Means clustering, we identified a "Casual consumer" in Cluster 1. These readers do not rate books very often or leave a lot of reviews. However they do tend to be very critical in their reviews as their average rating is only a a 2.94.
+
+\subsection{Discovery Question 3: Engagement Volume}
+
+Our team's final discovery question asked if patterns could emerged from highly up-voted reviews compared to reviews with a lot of down votes or no votes at all. A Pearson correlation analysis revealed a notable moderate positive correlation
 Beyond genre tags and ratings, we extracted user engagement metrics from the \texttt{goodreads\_reviews\_dedup.json.gz} dataset to identify behavioral patterns. A Pearson correlation analysis reveals a notable moderate positive correlation of $0.52$ between the number of comments (\texttt{n\_comments}) and the number of votes (\texttt{n\_votes}), suggesting that reviews sparking discussion are also more likely to be perceived as helpful or popular. Conversely, our initial hypothesis that \texttt{review\_length} would drive higher engagement was unsupported, as it maintained negligible correlations with both \texttt{n\_votes} ($0.03$) and \texttt{n\_comments} ($0.04$). Furthermore, the numerical \texttt{rating} appears entirely decoupled from interaction volume, showing correlations of $0.00$ and $-0.01$ against votes and comments, respectively. These results indicate that while social interactions (voting and commenting) tend to scale together, they are driven by factors other than the sentiment of the rating or the verbosity of the review.
 
 \begin{figure}[hbtp]
@@ -183,41 +230,7 @@ Visualizing this relationship via a scatterplot (Figure \ref{fig:engagement_scat
 \end{figure}
 
 
-\subsection{Answering Discovery Question 1: Genre Associations}
 
-Our team originally asked if readers of ``Romantasy'' (Romance Fantasy) also showed high interest in other specific romance sub-genres. After running the FP-Growth algorithm on our transaction data, the top association rules generated lift values of approximately 6.8 to 7.0 for various fantasy sub-genres, rather than romance genres.
-
-
-\begin{table}[htbp]
-\caption{Top Discovered Genre Association Rules by Lift}
-\begin{center}
-\begin{tabular}{@{}llcc@{}}
-\toprule
-\textbf{Antecedents} & \textbf{Consequents} & \textbf{Lift} & \textbf{Support} \\ \midrule
-\{paranormal, fiction\} & \{supernatural\} & 7.59 & 0.088 \\
-\{favourites, novels\} & \{novel\} & 6.93 & 0.081 \\
-\{novels, adult\} & \{adult-fiction\} & 6.44 & 0.082 \\
-\{paranormal, fantasy\} & \{supernatural\} & 6.23 & 0.093 \\ \bottomrule
-\end{tabular}
-\label{tab:association_rules}
-\end{center}
-\end{table}
-
-While we did not see strong associations between romance genres at our current minimum support threshold of 0.08, our findings strongly support the broader hypothesis of sub-genre cross-pollination. As shown in Table \ref{tab:association_rules} readers of fantasy and fiction are highly tag other related genres. This is evidenced by the strong associations found between ``paranormal'' and ``supernatural'' fiction yielding a high lift of 7.59. Another pattern we observed is the overlap between ``paranormal`` and fantasy yielding a high lift of 6.23 which confirms that sub-genre crossover pollination is a real thing.
-
-\begin{figure}[hbtp]
-    \centering
-    \includegraphics[width=\linewidth]{04_associationrules.png}
-    \caption{Genre Associations}
-    \label{fig:association_rules}
-\end{figure}
-
-
-
-
-\section{Updated Plan for Milestone 3}
-
-Moving into Milestone 3, our plan remains aligned with the original Milestone 1 proposal. Since we have successfully established our preprocessing pipeline and validated our association rules, our next focus will be applying K-Means clustering to answer our second discovery question. We will collect user interactions from rating variance and review length—to identify distinct reader categories (e.g., casual consumers vs. critical reviewers). Additionally, we will begin exploring Latent Dirichlet Allocation (LDA) for text mining the review bodies.
 \section*{Acknowledgment}
 The author would like to thank Julian McAuley for providing the Goodreads dataset and Kennesaw State University for the computational resources.
 
