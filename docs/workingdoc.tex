@@ -127,18 +127,17 @@ M4 & Weeks 14 & Text Mining (LDA), Final Report \\ \bottomrule
 
 \section{Milestone 2}
 
-This section details the work done for Milestone 2 of this data mining project. This milestone focused on an inital implementation of an exploratory discovery analysis to initially answer one of our three discovery questions. The section begins by explaining the reasoning for preprocessing and cleaning up the noisy dataset. Our team then analyses the most frequent tags of users' bookshelves to gain a first look at how users categorize books on the site. This section also covers our findings on discovery question 1 and how we came to our conclusions.  In addition to discovery question 1, we have provided visualizations of our findings.
+This section details the work done for Milestone 2 of this data mining project which focused on the initial implementation of an exploratory discovery analysis. Our primary goal for this milestone was to address the first of our three discovery questions through data cleaning, analysis, and visualization Our team analyzes the most frequent tags of users' bookshelves to gain a first look at how users categorize books on the site.
 
 
 \subsection{Preprocessing and Data Transformation}
 
-In order to transition from the introductory and theoretical discovery questions from the previous sections our team implemented multiple scripts to select and gather the raw data from the dataset.
- To begin answering our discovery questions we will need to preprocess our data through a python code to filter the massive dataset by cleaning some administrative tags and filtering out non-English languages. First we performed a keyword search across the "popular\_shelves" attribute of the \texttt{goodreads\_books.json.gz} file. We specifically search for genres: 'romantasy', 'romantic-fantasy', 'fantasy-romance', 'romance', 'fantasy', and 'romantic'. The filtered results are stored in \texttt{01\_filteredbooks.json}. The resulting json consists of records: book\_id, title, average\_rating, shelves\_list.
+In order to transition from the introductory and theoretical questions from the previous sections our team implemented multiple scripts to select and gather the raw data from the dataset.
+ To begin answering our discovery questions we had to preprocess our data through a filter the massive dataset by cleaning some administrative tags and filtering out non-English languages. First we performed a keyword search across the "popular\_shelves" attribute of the \texttt{goodreads\_books.json.gz} file. We specifically search for genres: 'romantasy', 'romantic-fantasy', 'fantasy-romance', 'romance', 'fantasy', and 'romantic'. The filtered results are stored in \texttt{01\_filteredbooks.json}. The resulting json consists of records: book\_id, title, average\_rating, shelves\_list.
 
 
 To answer discovery question 1, we need to examine the different user interactions, so we implemented a second filtering script utilizing the book\_id from our previous script to extract reviews from the \texttt{goodreads\_reviews\_dedup.json.gz} dataset, storing the output in \texttt{03\_extractedreviews.csv}.
 
-The datasets required significant cleaning before our team could conduct meaningful mining. First, we removed generic administrative tags like \texttt{`to-read'} and \texttt{`ebooks'} from the books dataset to reduce noise. Second, to focus our analysis and ensure data comprehension, we removed any non-English records from the reviews dataset using the Python package \texttt{langid}.
 
 \subsection{Exploratory Data Analysis}
 Before applying our mining algorithms, our team examined the distributions of ratings, community-defined tags (for example users can create virtual bookshelves and give them a name), and review engagement to establish a baseline understanding of the ``Romantasy'' and other romance genres subset.
@@ -185,7 +184,7 @@ antecedents & consequents & lift & support \\
 \end{table}
 
 
-Even with our highly sensitive thresholds and normalized data, the dataset did not support our inital hypothesis. The FP-Growth algorithm did not find any strong association rules linking 'Romantasy' or other related genres to other specific categories. This suggests that users who tag books with 'Romantasy' tend to treat it as a standalone category. Cross-tagging these books they tend to be associated with broad labels. This null result provides a clear answer to our first discovery question: Readers do not typically engage in sub-genre cross-pollination within the romance category. Instead, ``Romantasy'' serves as a descriptive tag for these users.
+Even with our highly sensitive thresholds and normalized data, the dataset did not support our initial hypothesis. The FP-Growth algorithm did not find any strong association rules linking 'Romantasy' or other related genres to other specific categories. This suggests that users who tag books with 'Romantasy' tend to treat it as a standalone category. Cross-tagging these books they tend to be associated with broad labels. This null result provides a clear answer to our first discovery question: Readers do not typically engage in sub-genre cross-pollination within the romance category. Instead, ``Romantasy'' serves as a descriptive tag for these users.
 
 \begin{figure}[hbtp]
     \centering
@@ -199,7 +198,7 @@ Even with our highly sensitive thresholds and normalized data, the dataset did n
 
 \section{Milestone 3}
 
-Moving into Milestone 3, our plan remains aligned with the original Milestone 1 proposal. Since we have established our preprocessing pipeline and validated our association rules, our next focus will be applying K-Means clustering to answer our last two discovery questions. We will collect user interactions in an attempt to identify reader personas and find patterns from highly up-voted reviews compared to low rated reviews.
+Moving into Milestone 3, our plan remains aligned with the original Milestone 1 proposal. Since we have established our preprocessing pipeline and validated our association rules, our next focus will be applying K-Means clustering to answer our last two discovery questions. We will collect user interactions in an attempt to identify reader personas and find patterns from highly up-voted reviews compared to low rated reviews. However K-means clustering and Pearson's Correlation analysis was only enough to disprove our third discovery question's hypothesis. In order to fully conclude the hypothesis our team had to run the dataset through a LDA model.
 
 
 \subsection{Discovery Question 2: Reader Personas}
