@@ -52,3 +52,10 @@ For all platforms:
 ```sh
    jupyter notebook
 ```
+
+
+# M3: Full Implementation
+
+Milestone 3 is very comprehensive and was my favorite part of this project. I refactored much of the notebook and included the scripts as part of it and not using %run anymore. I also overhauled and changed a lot of the scripts as such any python scripts in ` scripts/ ` may not be accurate anymore. All code needed for the analysis and this project is inside the Jupyter notebook located inside `notebooks/Data Mining Project.ipynb`. The `scripts/` folder will be kept for archival purposes and to show the development process. 
+
+Before running the notebook make sure to run `pip install -r requirements.txt` as many more requirements were added to complete the required analysis. In addition I have also switched from using `jupyter lab` to `jupyter notebook` as it provides a simpler website UI. 
