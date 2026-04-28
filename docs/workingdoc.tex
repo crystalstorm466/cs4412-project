@@ -14,7 +14,9 @@
 \begin{document}
 
 \title{Data Mining Project: Analyzing Reader Patterns and Genre Associations in the Goodreads Dataset*\\
-{\footnotesize \textsuperscript{*} CS 4412: Data Mining}
+{\footnotesize \textsuperscript{*}
+\keywords{Data mining, Association rule mining, K-means clustering, Latent dirichlet allocation, Reading behavior analysis}
+CS 4412: Data Mining}
 \thanks{Identify applicable funding agency here. If none, delete this.}
 }
 
@@ -169,7 +171,7 @@ As shown in Figure \ref{fig:tag_frequencies}, the most prevalent tags post-clean
 
 \subsection{Answering Discovery Question 1: Genre Associations}
 
-Our team originally proposed if readers of ``Romantasy'' (Romance Fantasy) also showed high interest in other specific romance sub-genres. During our initial run developing our implementation for Milestone 2 our FP-Growth algorithm generated relationships based off structural administrative tags rather than genre relationships like romance. Furthermore, variations in user-generated text caused our target genre to be heavily diluted. To correct this for Milestone 3, we implemented a data normalization pipeline to aggregate variations of Romantasy (e.g., ``fantasy romance'', ``paranormal romance'') into standardized categories. We also significantly lowered our algorithm parameters, dropping the minimum support threshold to 0.01 (1\% of transactions) and the minimum lift threshold to 2, to ensure we were not filtering out niche sub-genre connections. 
+Our team originally proposed if readers of ``Romantasy'' (Romance Fantasy) also showed high interest in other specific romance sub-genres. During our initial run developing our implementation for Milestone 2 our FP-Growth algorithm generated relationships based off structural administrative tags rather than genre relationships like romance. Furthermore, variations in user-generated text caused our target genre to be heavily diluted. To correct this for Milestone 3, we implemented a data normalization pipeline to aggregate variations of Romantasy (e.g., ``fantasy romance'', ``paranormal romance'') into standardized categories. We also significantly lowered our algorithm parameters, dropping the minimum support threshold to 0.01 (1\% of transactions) and the minimum lift threshold to 2, to ensure we were not filtering out niche sub-genre connections.
 
 
 \begin{table}
@@ -197,14 +199,14 @@ Even with our highly sensitive thresholds and normalized data, the dataset did n
 
 
 
-\section{Milestone 3}
+\section{Exploratory Data Analysis}
 
-Moving into Milestone 3, our plan remains aligned with the original Milestone 1 proposal. Since we have established our preprocessing pipeline and validated our association rules, our next focus will be applying K-Means clustering to answer our last two discovery questions. We will collect user interactions in an attempt to identify reader personas and find patterns from highly up-voted reviews compared to low rated reviews. However K-means clustering and Pearson's Correlation analysis was only enough to disprove our third discovery question's hypothesis. In order to fully conclude the hypothesis our team had to run the dataset through a LDA model. 
+Moving into the Exploratory Data Analysis, our plan remains aligned with the original Milestone 1 proposal. Since we have established our preprocessing pipeline and validated our association rules, our next focus will be applying K-Means clustering to answer our last two discovery questions. We will collect user interactions in an attempt to identify reader personas and find patterns from highly up-voted reviews compared to low rated reviews. However K-means clustering and Pearson's Correlation analysis was only enough to disprove our third discovery question's hypothesis. In order to fully conclude the hypothesis our team had to run the dataset through a LDA model.
 
 
 \subsection{Discovery Question 2: Reader Personas}
 
-The second discovery question explored whether our team could categorize users as "critical reviewers" or "casual consumers" based on average rating variance, review frequency, and review length. To categorize these users, our team performed a K-Means analysis using Elbow charts to determine the optimal number of clusters based on \{review\_frequency, avg\_rating, rating\_variance\}. 
+The second discovery question explored whether our team could categorize users as "critical reviewers" or "casual consumers" based on average rating variance, review frequency, and review length. To categorize these users, our team performed a K-Means analysis using Elbow charts to determine the optimal number of clusters based on \{review\_frequency, avg\_rating, rating\_variance\}.
 
 Based on the Elbow method, we determined that four clusters (Table \ref{tab:persona_profiles}) best represent the Goodreads user base: 'Generous Consumer,' 'Harsh Consumer,' 'Powered Reader,' and 'Standard Reviewer.' Our team verified these clusters using K-Means silhouette scores. While the Elbow method suggested a range of potential values, the silhouette score peaked at k=4 with a value of 0.50, proving that these four groups are statistically distinct and well-separated."
 
@@ -217,16 +219,16 @@ Based on the Elbow method, we determined that four clusters (Table \ref{tab:pers
 
 \subsubsection{Cluster 0: Harsh Consumer}
 
-This group is the third largest reading group however this group also seems to read the least. This reading group is categorized by the lowest overall rating of any group. With an average rating of 2.93 and a high variance, it suggests that they either find a rare "5-star" gem or more likely loathe what they read. These are your more difficult to please critics. 
+This group is the third largest reading group however this group also seems to read the least. This reading group is categorized by the lowest overall rating of any group. With an average rating of 2.93 and a high variance, it suggests that they either find a rare "5-star" gem or more likely loathe what they read. These are your more difficult to please critics.
 
 
 
 \subsubsection{Cluster 1: Generous Consumer }
 
-This is the biggest reading group. Although the readers in this group only rate books occasionally, they seem to love the books they do rate as they have an average rating of 4.44 with a small rating variance of 0.56. 
+This is the biggest reading group. Although the readers in this group only rate books occasionally, they seem to love the books they do rate as they have an average rating of 4.44 with a small rating variance of 0.56.
 \subsubsection{Cluster 2: Powered reader}
 
-This is the smallest reading group. However despite being the smallest this group averages a review every single day and review the most books out of any group with a review frequency of 321.72. They are fair but tend to be firm in their ratings with a rating variance of 1.08 but only an average rating of 3.78. 
+This is the smallest reading group. However despite being the smallest this group averages a review every single day and review the most books out of any group with a review frequency of 321.72. They are fair but tend to be firm in their ratings with a rating variance of 1.08 but only an average rating of 3.78.
 
 \subsubsection{Cluster 3: Standard reviewer}
 
@@ -273,14 +275,14 @@ Visualizing this relationship via a scatterplot (Figure \ref{fig:engagement_scat
 
 \subsubsection{Latent Dirichlet Allocation (LDA) }
 
-Because our Milestone 3 findings proved that longer reviews and star ratings do not correlate with higher community engagement, our team decided to transition to qualitative text mining to answer our final discovery question. We utilized Latent Dirichlet Allocation (LDA), This is a machine learning algorithm designed to tokenize a massive dataset to find patterns and divide them up. 
+Because our Milestone 3 findings proved that longer reviews and star ratings do not correlate with higher community engagement, our team decided to transition to qualitative text mining to answer our final discovery question. We utilized Latent Dirichlet Allocation (LDA), This is a machine learning algorithm designed to tokenize a massive dataset to find patterns and divide them up.
 
 Our team first had to prepare our review dataset. Importing our \texttt{03\_extractedreviews.csv} into a Pandas dataframe, we tokenized the review text while simultaneously stripping non-alphabetic characters and filtering out custom domain stop-words (e.g., `book', `read', `story') that add no value. After converting our cleaned tokens into a matrix, we built an LDA model. To ensure we extracted concise and highly specific themes, we configured the model to search for 40 distinct components ($n\_components=40$). We then mapped these generated topics against our engagement metrics (\texttt{n\_votes}, \texttt{n\_comments}, and \texttt{review\_count}).
 
-Reviewing our modeled data allows us to identify several distinct themes that drive community interaction. While our team identified 40 topics a few of the big themes were Analytical critique, Emotional Reactionaires and Administrative / ARC disclaimers. 
+Reviewing our modeled data allows us to identify several distinct themes that drive community interaction. While our team identified 40 topics a few of the big themes were Analytical critique, Emotional Reactionaires and Administrative / ARC disclaimers.
 
 \begin{itemize}
-    \item \textbf{Analytical critique (Topics 7, 13 \% 22)} These topics mention specifically world building and pacing of the books. These books averaged about 0.22-1.93 votes and 0.29-0.52 comments. This suggests that the analytical critique reviews are popular with the goodreads community and are favored greatly. 
+    \item \textbf{Analytical critique (Topics 7, 13 \% 22)} These topics mention specifically world building and pacing of the books. These books averaged about 0.22-1.93 votes and 0.29-0.52 comments. This suggests that the analytical critique reviews are popular with the goodreads community and are favored greatly.
      \item \textbf{Emotional Reactionaries (Topics 18 \& 34):} These topics captured reviews focused entirely on feelings, specifically mentioning ``book hangovers'' and crying. Essentially, the readers who wrote these reviews loved the books so much they could not seem to get over the ending. Interestingly, these reviews saw notably lower engagement than the analytical critiques, averaging between 0.79 and 0.80 votes, and 0.18 to 0.37 comments.
     \item \textbf{Administrative / ARC disclaimers (Topic 35):} Topic 35 was an interesting one. Despite our team doing our best to pre-process our datasets and remove administrative tags a few reviews were prevalent enough to be included. These readers talked about their blog or disclosing advanced reader's copies before reviewing. Most authors hand out Advanced Reader's Copies (ARC) for them to get a bunch of reviews before a product launch. Since the expectation for readers with ARCs is to review books our team expects to have high levels of engagement. Furthermore, this group had a \texttt{n\_votes} value of 1.76 while \texttt{n\_comments} had a value of 0.64.
 
@@ -289,9 +291,31 @@ Reviewing our modeled data allows us to identify several distinct themes that dr
 
 
 
-\section{Milestone 4}
+\section{Critical Assessment}
 
-Milestone 4 will focus on refinement and re-factoring code. We plan to present our finished project for milestone 4 so our team will focus on cleaning up the report and the Juptyer notebooks to get a finished final product. We plan to look at all the feedback from the other three milestones to come up with a finished product. 
+
+
+
+
+\subsection{Validation}
+
+The validity of our findings is supported by our team's rigorous methodology and iterative approach. To categorize reader personas we did not rely on heuristic or arbitrary estimations. Instead we relied on the Elbow method in conjunction with a K-means silhouette sweep which yielded a distinct peak at k = 4 with a score of 0.50. This confirms our four reader groups are statistically distinct populations rather than overlapping subsets.
+
+Our conclusions regarding user engagement are analytically valid as they were driven with data rather than pre-conceived assumptions. When our initial Pearson correlation tests disproved the hypothesis that review length and rating predict engagement, we pivoted to Latent Dirichlet Allocation (LDA). By allowing the textual data to define the topics, we captured authentic behavioral definitions, such as the unusual high engagement surrounding disclaimers about ARCs (Topic 35). This iterative process ensures our final claims are firmly grounded in actual, measurable user behavior.
+
+\subsection{Limitations}
+
+The UCSD Goodreads dataset is from 2017. The dataset we analyzed is almost ten years old at the tail end of the "YA Dystopian" popularity. The 2020 COVID-19 pandemic saw a shifted in reading treads and saw a rise in the Romance Fantasy sub genre with a new introduction of many readers. If another dataset was created today our team expects our results to be significantly different.
+
+\subsection{Ethical Considerations \& Biases}
+
+Our team is aware that many readers do not fit cleanly into one simple box. By grouping readers it can create some unfair comparisons leading some people to feel misrepresented. Our team also recognizes the inherent self-selection bias within the Goodreads platform itself. Because our dataset relies entirely on individuals who proactively choose to leave reviews, it naturally over-represents highly vocal or opinionated readers while omitting the silent majority of consumers who read without interacting socially online. Additionally, since our dataset is from 2017, our analysis does not capture recent shifts in reader communities, such as the modern influence of video-based social media platforms such as Instagram Reels or TikTok on the Romantasy genre. Therefore, while our four-persona model provides strong statistical utility for understanding engagement patterns, these groupings should be viewed as analytical approximations of behavior rather than absolute definitions of reader identity.
+
+\section{Conclusion}
+
+Our team had a goal of analyzing the UCSD 2017 Goodreads dataset to group and discover what types of readers are on the Goodreads platform. By applying a multi-data algorithm pipeline our analysis successfully moved past predictive modeling to uncover genuine behavior models within the reading community. The initial hypothesis that engagement scaled predictably with review length or rating was disproven, prompting a highly effective analytical pivot toward textual topic modeling. The application of K-Means clustering, mathematically validated by a silhouette score of 0.50, established a robust four-persona model of the user base: the Generous Consumer, Harsh Consumer, Powered Reader, and Standard Reviewer. This categorization provides a clear, statistically distinct framework for understanding how different readers interact with books.
+
+While these findings provide deep insights into the 2017 Goodreads ecosystem, the landscape of online literary discussion is constantly evolving. Future work should seek to apply this established methodology to more recent datasets. Our team recommends that if future analysis are requested other teams would examine the reader communities found outside of Goodreads such as the YouTube community. Analyzing the explosion of these influencers will our future teams to track reader engagement and genre associations and how they are influenced.
 
 
 \section*{Acknowledgment}
@@ -304,4 +328,3 @@ The author would like to thank Julian McAuley for providing the Goodreads datase
 \end{thebibliography}
 
 \end{document}
-
