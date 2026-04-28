@@ -1,9 +1,8 @@
 # CS 4412 - Data Mining Project 
 
-Goodreads Data mining
 
-Author: David Holland
-E-Mail: dholla36@students.kennesaw.edu
+**Author:** David Holland  
+**E-Mail:** DcHolland_04@protonmail.com
 
 ## Project Overview
 This data mining project analyzes the 2017 UCSD Goodreads dataset to uncover behavioral patterns within the reading community. By utilizing Association Rule Mining (FP-Growth), K-Means Clustering, and Latent Dirichlet Allocation (LDA) Topic Modeling, this project moves beyond standard rating predictions to categorize distinct "Reader Personas" and identify the contextual drivers of high community engagement.
