@@ -206,7 +206,14 @@ Moving into Milestone 3, our plan remains aligned with the original Milestone 1 
 
 The second discovery question explored whether our team could categorize users as "critical reviewers" or "casual consumers" based on average rating variance, review frequency, and review length. To categorize these users, our team performed a K-Means analysis using Elbow charts to determine the optimal number of clusters based on \{review\_frequency, avg\_rating, rating\_variance\}. 
 
-Based on the Elbow method, we determined that four clusters (Table \ref{tab:persona_profiles}) best represent the Goodreads user base: "Generous Consumer," "Harsh Consumer," "Powered Reader," and "Standard Reviewer."
+Based on the Elbow method, we determined that four clusters (Table \ref{tab:persona_profiles}) best represent the Goodreads user base: 'Generous Consumer,' 'Harsh Consumer,' 'Powered Reader,' and 'Standard Reviewer.' Our team verified these clusters using K-Means silhouette scores. While the Elbow method suggested a range of potential values, the silhouette score peaked at k=4 with a value of 0.50, proving that these four groups are statistically distinct and well-separated."
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{silhouettescores.png}
+    \caption{Silhouette Scores from K-means analysis}
+    \label{fig:Silhouette Score Sweep}
+\end{figure}
 
 \subsubsection{Cluster 0: Harsh Consumer}
 
