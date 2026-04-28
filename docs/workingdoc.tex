@@ -27,7 +27,7 @@ dholla36@students.kennesaw.edu}
 
 }
 
-\maketitle
+
 
 \begin{abstract}
 This proposal outlines a data mining project focused on the 2017 Goodreads dataset. This study aims to discover relationships between book genres, user behaviors, and how readers structure their reviews. We will be applying different techniques such as Association Rule Mining, K-Means Clustering, and Latent Dirichlet Allocation. This proposal seeks to understand how readers associate different genres in an attempt to define different segments of the reading community.
@@ -60,7 +60,7 @@ The dataset is split into two primary components:
 \end{enumerate}
 
 
-\section{C. Data Quality and Preprocessing}
+\section{Data Quality and Preprocessing}
 
 Known issues include many user-defined shelves that share common tags like "to-read" and varying review lengths. This is most likely caused from Goodread's ability to easily add books to user's "to-read" shelve. Preprocessing will involve tokenization, stop-word removal for text mining and transforming the nested JSON shelves into a transaction-style for association mining.
 
@@ -70,8 +70,7 @@ This project moves beyond prediction models to investigate the following questio
 \begin{itemize}
     \item What are the hidden associations between specific book genres and user-defined "shelves"? (Do readers of "Romantasy" (Romance Fantasy) also show high interest in other genres like fantasy?
     \item Can we identify distinct Reader Personas based on interaction metrics? By clustering users based on their average rating variance, review frequency, and review length our goal is to discover if it is possible to classify readers into different groups?
-    \item  What type of patterns emerge from highly-voted reviews
-compared to low-voted ones?
+    \item  What type of patterns emerge from highly-voted reviews compared to low-voted ones?
 \end{itemize}
 
 \section{Planned Techniques}
@@ -102,7 +101,7 @@ The analysis will follow a multistage data mining pipeline as visualized in Figu
 \subsection{Association Rule Mining (FP-Growth)}\label{AA}
     We will treat each user's shelves as a transaction. Using the FP-Growth Algorithm to discover rules with high lift and confidence to identify non-obvious genre relationships. Our goal is to move beyond the standard "Fantasy" label and discover more sub-genre patterns.
 \subsection{Clustering (K-Means)}
-    To answer the second discovery question, we will apply K-Means clustering on standarized numerical features derived the user dataset. We will be using the "Elbow Method" and "Silhoutette Score" to determine the optimal number of reader segments.
+    To answer the second discovery question, we will apply K-Means clustering on standardized numerical features derived the user dataset. We will be using the "Elbow Method" and "Silhouette Score" to determine the optimal number of reader segments.
 \subsection{Text Mining (LDA - Topic Modeling)}
     Using the Latent Dirichlet Allocation (LDA) algorithm, we will perform topic modeling on the \texttt{review\_text}. This will allow us to discover the primary topics of discussion within different genres without pre-defining what those topics are.
 
