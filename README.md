@@ -18,7 +18,8 @@ https://cseweb.ucsd.edu/~jmcauley/datasets/goodreads.html#datasets
 - goodreads_interactions.csv
 - goodreads_reviews_dedup.json.gz
 
-**Important:** Once downloaded, create a folder named `data/` in the root directory of this repository and place all three files inside it. The Jupyter Notebook relies on this folder structure to execute properly.
+**Important:**
+ Once downloaded, create a folder named `data/` in the root directory of this repository and place all three files inside it. The Jupyter Notebook relies on this folder structure to execute properly.
 
 ## Setup
 
@@ -65,7 +66,7 @@ All data ingestion, preprocessing, and machine learning models are consolidated 
 
 3. Run the notebook cells sequentially from top to bottom. The notebook will automatically handle the chunked reading of the multi-gigabyte JSON files, filter the targeted genres, and generate the intermediate CSV files required for the final clustering and LDA models.
 
-* Note: Our team initally used python scripts are kept in the scripts/ folder for archival and developmental context and imported them into the notebook using %run but the Jupyter Notebook is the definitive, fully-integrated version of this project. **
+* Note: Our team initally used python scripts are kept in the scripts/ folder for archival and developmental context and imported them into the notebook using %run but the Jupyter Notebook is the definitive, fully-integrated version of this project. *
 
 
 Before running the notebook make sure to run `pip install -r requirements.txt` as many more requirements were added to complete the required analysis. In addition I have also switched from using `jupyter lab` to `jupyter notebook` as it provides a simpler website UI. 
